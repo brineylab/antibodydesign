@@ -8,9 +8,11 @@ import os
 import queue
 import subprocess as sp
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, Iterable, Optional, Tuple, Union
 
 import abutils
+import magika
 import torch
 from natsort import natsorted
 from tqdm.auto import tqdm
@@ -231,15 +233,19 @@ def ligandmpnn(
         temperatures = sorted(temperature)
 
     # chains
-    if isinstance(chains_to_design, (list, tuple)):
-        chains_to_design = ",".join([str(c) for c in chains_to_design])
-    if isinstance(parse_these_chains_only, (list, tuple)):
-        parse_these_chains_only = ",".join([str(c) for c in parse_these_chains_only])
+    chains_to_design = _process_chain_or_residue_data(
+        chains_to_design, pdbs=pdbs, sep=","
+    )
+    parse_these_chains_only = _process_chain_or_residue_data(
+        parse_these_chains_only, pdbs=pdbs, sep=","
+    )
 
     # fixed/redesigned residues
-    fixed_residues_dict = _process_residue_data(fixed_residues, pdbs, "fixed")
-    redesigned_residues_dict = _process_residue_data(
-        redesigned_residues, pdbs, "redesigned"
+    fixed_residues_dict = _process_chain_or_residue_data(
+        fixed_residues, pdbs=pdbs, sep=" "
+    )
+    redesigned_residues_dict = _process_chain_or_residue_data(
+        redesigned_residues, pdbs=pdbs, sep=" "
     )
 
     # bias AA
@@ -399,27 +405,28 @@ def _get_ligandmpnn_cmd(
     return cmd
 
 
-def _process_residue_data(
-    residue_data: Union[str, Dict[str, str], None],
+def _process_chain_or_residue_data(
+    data: Union[str, Dict[str, str], None],
     pdbs: Iterable,
-    data_type: str,
+    sep: str = " ",
 ) -> Dict[str, str]:
     """
-    Process residue input.
+    Process chain or residue input.
 
     Parameters
     ----------
-    residue_data : Union[str, Dict[str, str], None]
-        Residue data. Can be either:
-            - a file path to a JSON file, with PDB file paths as keys and residue IDs as values
-            - a string of space-separated residue IDs
-            - a list of residue IDs
+    data : Union[str, Dict[str, str], None]
+        Chain or residue data. Can be either:
+            - a file path to a JSON file, with PDB file paths as keys and space- or comma-separated chain or residue IDs as values
+            - a file path to a plain text file, with space- or comma-separated chain or residue IDs that will be applied to all PDBs
+            - a string of space- or comma-separated chain or residue IDs
+            - a list or tuple of chain or residue IDs
 
     pdbs : Iterable
         List of PDB file paths.
 
-    data_type : str
-        Type of data, either "fixed" or "redesigned".
+    sep : str, default=" "
+        Separator to be used when compiling a string representation of chain or residue data from an Iterable.
 
     Returns
     -------
@@ -427,25 +434,31 @@ def _process_residue_data(
         Residue dictionary.
 
     """
-    if residue_data is not None:
-        if isinstance(residue_data, str):
-            if os.path.isfile(residue_data):
-                with open(residue_data, "r") as f:
-                    residues_dict = json.load(f)
+    if data is not None:
+        if isinstance(data, str):
+            if os.path.isfile(data):
+                filetype = magika.identify_path(Path(data)).output.label
+                with open(data, "r") as f:
+                    # JSON file, which is a mapping of PDB file paths to residue IDs
+                    if filetype == "json":
+                        residues_dict = json.load(f)
+                    # plain text file, which is just residue IDs that will be applied to all PDBs
+                    else:
+                        residues_dict = {pdb: f.read().strip() for pdb in pdbs}
             else:
-                residues_dict = {pdb: residue_data for pdb in pdbs}
-        elif isinstance(residue_data, (list, tuple)):
-            residue_data = " ".join([str(r) for r in residue_data])
-            residues_dict = {pdb: residue_data for pdb in pdbs}
+                residues_dict = {pdb: data for pdb in pdbs}
+        elif isinstance(data, (list, tuple)):
+            data = sep.join([str(r) for r in data])
+            residues_dict = {pdb: data for pdb in pdbs}
         else:
-            raise ValueError(f"Invalid {data_type} residue data: {residue_data}")
+            raise ValueError(f"Invalid chain or residue data: {data}")
     else:
         residues_dict = {}
     return residues_dict
 
 
 def _process_per_residue_data(
-    per_residue_data: Union[str, Dict[str, str], None],
+    data: Union[str, Dict[str, str], None],
     pdbs: Iterable,
 ) -> Tuple[Optional[str]]:
     """
@@ -453,10 +466,10 @@ def _process_per_residue_data(
 
     Parameters
     ----------
-    per_residue_data : Union[str, Dict[str, str], None]
+    data : Union[str, Dict[str, str], None]
         Per-residue data.
 
-    pdb_paths : Iterable
+    pdbs : Iterable
         List of PDB file paths.
 
     Returns
@@ -465,17 +478,15 @@ def _process_per_residue_data(
         Per-residue data dictionary.
 
     """
-    if per_residue_data is not None:
-        if isinstance(per_residue_data, str):
-            if os.path.isfile(per_residue_data):
-                with open(per_residue_data, "r") as f:
+    if data is not None:
+        if isinstance(data, str):
+            if os.path.isfile(data):
+                with open(data, "r") as f:
                     res_data = json.load(f)
             else:
-                raise ValueError(
-                    f"Supplied per-residue data ({per_residue_data}) does not exist"
-                )
+                raise ValueError(f"Supplied per-residue data ({data}) does not exist")
         else:
-            res_data = per_residue_data
+            res_data = data
         if any(os.path.isfile(k) for k in res_data.keys()):
             return res_data
         else:
