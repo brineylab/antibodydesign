@@ -417,16 +417,14 @@ def ligandmpnn(
                     # get cmd
                     cmd = _get_ligandmpnn_cmd(params=params)
 
-                    #
-                    #
-                    print(f"\n\n\n{cmd}\n\n\n")
-                    #
-                    #
-
                     # submit cmd to thread pool
                     futures.append(executor.submit(gpu_worker, cmd, gpu_queue))
         # monitor progress
-        with tqdm(total=len(futures), desc="Running LigandMPNN") as pbar:
+        with tqdm(
+            total=len(futures),
+            desc="LigandMPNN",
+            bar_format="{desc:<2.5}{percentage:3.0f}%|{bar:25}{r_bar}",
+        ) as pbar:
             for _ in concurrent.futures.as_completed(futures):
                 pbar.update(1)
 
