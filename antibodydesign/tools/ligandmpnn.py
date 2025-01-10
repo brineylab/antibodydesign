@@ -240,7 +240,7 @@ def ligandmpnn(
     started_from_cli : bool, optional, default=False
         Whether the function was called from the CLI.
 
-    verbose : bool, optional, default=False
+    verbose : bool, optional, default=True
         Whether to print verbose output.
 
     debug : bool, optional, default=False
@@ -375,7 +375,7 @@ def ligandmpnn(
     if started_from_cli:
         abutils.log.setup_logging(
             logfile=os.path.join(output_dir, "ligandmpnn.log"),
-            add_stream_handler=verbose,
+            add_stream_handler=True,
             single_line_handler=False,
             debug=debug,
         )
