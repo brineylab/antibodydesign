@@ -43,7 +43,7 @@ def cli():
 @click.option(
     "-s",
     "--seed",
-    type=Union[int, str],
+    # type=Union[int, str],
     default=42,
     help="Random seed(s) to use, for example '42' or '42,43'. If multiple seed values are provided, each PDB file will be processed with every combination of temperature and seed.",
 )
@@ -57,7 +57,7 @@ def cli():
 @click.option(
     "-t",
     "--temperature",
-    type=Union[float, str],
+    # type=Union[float, str],
     default=0.1,
     help="Temperature(s) to use, for example '0.1' or '0.1,0.2'. If multiple temperature values are provided, each PDB file will be processed with every combination of temperature and seed.",
 )
