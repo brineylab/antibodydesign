@@ -178,31 +178,30 @@ def ligandmpnn(
 
     omit_aa : Union[str, Dict[str, str], None], optional, default=None
         Omit the generation of AAs. Can be provided as:
-            - a string of comma-separated AA IDs: ``"ACG"``
-            - a dictionary mapping AA IDs to their biases: ``{"A": "ACG"}``
-            - a file path to a JSON file containing a dictionary mapping AA IDs to their biases, which will be applied to all PDB files: ``{"A": "ACG"}``
-            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of AA IDs: ``{"a1b2.pdb": {"A": "ACG"}}``
+            - a string of concatenated AAs to omit: ``"ACG"``
+            - a file path to a text file containing concatenated AAs to omit: ``"ACG"``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of concatenated AAs to omit: ``{"a1b2.pdb": "ACG"}``
 
     omit_aa_per_residue : Union[str, Dict[str, str], None], optional, default=None
         Omit the generation of AAs per residue. Can be provided as:
             - a string of comma-separated residue IDs: ``"A12:ACG"``
             - a dictionary mapping residue IDs to their biases: ``{"A12": "ACG"}``
             - a file path to a JSON file containing a dictionary mapping residue IDs to their biases, which will be applied to all PDB files: ``{"A12": "ACG"}``
-            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of residue IDs: ``{"a1b2.pdb": {"A12": "ACG"}}``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of per-residue AA omissions: ``{"a1b2.pdb": {"A12": "ACG"}}``
 
     fixed_residues : Union[str, Dict[str, str], None], optional, default=None
         Fix residues at the provided positions (redesign all other residues). Can be provided as:
             - a string of space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
             - a list or tuple of residue IDs: ``["A12", "A13", "A14", "B2", "B25"]``
             - a file path to a text file containing space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
-            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of residue IDs: ``{"a1b2.pdb": "A12 A13 A14 B2 B25"}``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to space-separated residue IDs: ``{"a1b2.pdb": "A12 A13 A14 B2 B25"}``
 
     redesigned_residues : Union[str, Iterable, None], optional, default=None
         Residues to redesign (all other residues will be fixed). Can be provided as:
           - a string of space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
           - a list or tuple of residue IDs: ``["A12", "A13", "A14", "B2", "B25"]``
           - a file path to a text file containing space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
-          - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of residue IDs: ``{"a1b2.pdb": "A12 A13 A14 B2 B25"}``
+          - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to space-separated residue IDs: ``{"a1b2.pdb": "A12 A13 A14 B2 B25"}``
 
     chains_to_design : Union[str, Iterable, None], optional, default=None
         Chains to design. Can be provided as:
@@ -337,10 +336,11 @@ def ligandmpnn(
     bias_aa_per_residue_dict = _process_per_residue_data(
         bias_aa_per_residue, pdbs=pdb_names
     )
-    if not all([pdb in bias_aa_per_residue_dict for pdb in pdb_names]):
-        raise ValueError(
-            f"Supplied bias_aa_per_residue ({bias_aa_per_residue}) does not have information for all input PDB files"
-        )
+    if bias_aa_per_residue_dict:
+        if not all([pdb in bias_aa_per_residue_dict for pdb in pdb_names]):
+            raise ValueError(
+                f"Supplied bias_aa_per_residue ({bias_aa_per_residue}) does not have information for all input PDB files"
+            )
 
     # omit AA
     if isinstance(omit_aa, (list, tuple)):
@@ -351,10 +351,11 @@ def ligandmpnn(
     omit_aa_per_residue_dict = _process_per_residue_data(
         omit_aa_per_residue, pdbs=pdb_names
     )
-    if not all([pdb in omit_aa_per_residue_dict for pdb in pdb_names]):
-        raise ValueError(
-            f"Supplied omit_aa_per_residue ({omit_aa_per_residue}) does not have information for all input PDB files"
-        )
+    if omit_aa_per_residue_dict:
+        if not all([pdb in omit_aa_per_residue_dict for pdb in pdb_names]):
+            raise ValueError(
+                f"Supplied omit_aa_per_residue ({omit_aa_per_residue}) does not have information for all input PDB files"
+            )
 
     # set up GPU queue and thread pool
     gpu_queue = queue.Queue()
