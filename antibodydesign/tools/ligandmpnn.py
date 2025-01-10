@@ -402,8 +402,10 @@ def ligandmpnn(
                         omit_aa_per_residue_dict=omit_aa_per_residue_dict.get(
                             pdb_name, None
                         ),
-                        chains_to_design=chains_to_design,
-                        parse_these_chains_only=parse_these_chains_only,
+                        chains_to_design=chains_to_design.get(pdb_name, None),
+                        parse_these_chains_only=parse_these_chains_only.get(
+                            pdb_name, None
+                        ),
                         use_side_chain_context=use_side_chain_context,
                         use_atom_context=use_atom_context,
                         batch_size=batch_size,
