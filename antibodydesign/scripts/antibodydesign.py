@@ -48,7 +48,6 @@ def cli():
     help="Random seed(s) to use, for example '42' or '42,43'. If multiple seed values are provided, each PDB file will be processed with every combination of temperature and seed.",
 )
 @click.option(
-    "g",
     "--gpus",
     type=str,
     default=None,
