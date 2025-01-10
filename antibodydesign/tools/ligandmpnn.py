@@ -298,7 +298,11 @@ def ligandmpnn(
     if isinstance(seed, int):
         seeds = [seed]
     elif isinstance(seed, str):
-        seeds = [int(s) for s in seed.split(",")]
+        if os.path.isfile(seed):
+            with open(seed, "r") as f:
+                seeds = [int(s) for s in f.read().split(",")]
+        else:
+            seeds = [int(s) for s in seed.split(",")]
     else:
         seeds = sorted(seed)
 
@@ -306,7 +310,11 @@ def ligandmpnn(
     if isinstance(temperature, float):
         temperatures = [temperature]
     elif isinstance(temperature, str):
-        temperatures = [float(t) for t in temperature.split(",")]
+        if os.path.isfile(temperature):
+            with open(temperature, "r") as f:
+                temperatures = [float(t) for t in f.read().split(",")]
+        else:
+            temperatures = [float(t) for t in temperature.split(",")]
     else:
         temperatures = sorted(temperature)
 
