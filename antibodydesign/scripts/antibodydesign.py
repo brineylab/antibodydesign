@@ -2,7 +2,7 @@
 # Distributed under the terms of the MIT License.
 # SPDX-License-Identifier: MIT
 
-from typing import Dict, Iterable, Optional, Union
+from typing import Optional, Union
 
 import click
 
