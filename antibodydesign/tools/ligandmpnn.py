@@ -136,9 +136,9 @@ def ligandmpnn(
 
     model_checkpoint : Optional[str], optional, default=None
         Checkpoint of the model to use, excluding the model name and file extension. For example,
-        if the full name of the weights file for the desired model checkpoint is ``"ligandmpnn_v_32_10_25.pt"``,
-        then `model_checkpoint` should be ``"v_32_10_25"``. If not provided, the default checkpoints are:
-            - ligand_mpnn: ``"v_32_10_25"``
+        if the full name of the weights file for the desired model checkpoint is ``"ligandmpnn_v_32_010_25.pt"``,
+        then `model_checkpoint` should be ``"v_32_010_25"``. If not provided, the default checkpoints are:
+            - ligand_mpnn: ``"v_32_010_25"``
             - protein_mpnn: ``"v_48_020"``
 
     seeds : Union[int, Iterable], optional, default=42
@@ -275,7 +275,7 @@ def ligandmpnn(
     # model checkpoint
     if model_checkpoint is None:
         if model_type == "ligand_mpnn":
-            model_checkpoint = "v_32_10_25"
+            model_checkpoint = "v_32_010_25"
         elif model_type == "protein_mpnn":
             model_checkpoint = "v_48_020"
     model_checkpoint = model_checkpoint.lower()
