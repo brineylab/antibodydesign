@@ -6,6 +6,7 @@ import concurrent.futures
 import json
 import os
 import queue
+import shutil
 import subprocess as sp
 from dataclasses import dataclass
 from pathlib import Path
@@ -51,6 +52,7 @@ class LigandMPNNParameters:
         """
         Post-initialization processing of per-position bias and omit AA data.
         """
+        # write AA bias and omit data to JSON files, return file paths
         self.bias_aa_per_residue = self._process_bias_aa_per_residue_dict()
         self.omit_aa_per_residue = self._process_omit_aa_per_residue_dict()
 
@@ -358,6 +360,9 @@ def ligandmpnn(
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(gpus)) as executor:
         for pdb in pdbs:
             pdb_name = os.path.basename(pdb).rstrip(".pdb")
+            pdb_output_dir = os.path.join(output_dir, pdb_name)
+            abutils.io.make_dir(pdb_output_dir)
+            shutil.copy(pdb, pdb_output_dir)
             for temperature in temperatures:
                 for seed in seeds:
                     # set up output directory
