@@ -94,9 +94,9 @@ def ligandmpnn(
     output_dir: str,
     model_type: str = "ligand_mpnn",
     model_checkpoint: Optional[str] = None,
-    seed: Union[int, Iterable] = 42,
-    gpus: Union[int, Iterable, None] = None,
-    temperature: Union[float, Iterable] = 0.1,
+    seed: Union[int, str, Iterable] = 42,
+    temperature: Union[float, str, Iterable] = 0.1,
+    gpus: Union[int, str, Iterable, None] = None,
     bias_aa: Union[str, Dict[str, float], None] = None,
     bias_aa_per_residue: Union[str, Dict[str, float], None] = None,
     omit_aa: Union[str, Dict[str, str], None] = None,
@@ -113,7 +113,7 @@ def ligandmpnn(
     verbose: bool = True,
 ):
     """
-    Run LigandMPNN on a PDB file, a list of PDB files, or a directory of PDB files.
+    Run LigandMPNN_ on a PDB file, a list of PDB files, or a directory of PDB files.
 
     .. note::
         If multiple temperature or seed values are provided, then each PDB file will be
@@ -140,14 +140,84 @@ def ligandmpnn(
             - protein_mpnn: ``"v_48_020"``
 
     seeds : Union[int, Iterable], optional, default=42
-        Random seed(s) to use. If multiple seed values are provided, each PDB file will be processed with
-        every combination of temperature and seed.
+        Random seed(s) to use. Can be provided as:
+            - a single integer: ``42``
+            - a comma-separated string of integers: ``"42,43"``
+            - a list or tuple of integers: ``[42, 43]``
+        If multiple seed values are provided, each PDB file will be processed with every combination of temperature and seed.
+
+    temperature : Union[float, Iterable], optional, default=0.1
+        Temperature(s) to use. Can be provided as:
+            - a single float: ``0.1``
+            - a comma-separated string of floats: ``"0.1,0.2"``
+            - a list or tuple of floats: ``[0.1, 0.2]``
+        If multiple temperature values are provided, each PDB file will be processed with every combination of temperature and seed.
 
     gpus : Union[int, Iterable, None], optional, default=None
-        GPU(s) to use, for example ``0`` or ``[0, 1]``. If not provided, all available GPUs will be used.
+        GPU(s) to use. Can be provided as:
+            - a single integer: ``0``
+            - a comma-separated string of integers: ``"0,1"``
+            - a list or tuple of integers: ``[0, 1]``
+        If not provided, all available GPUs will be used.
+
+    bias_aa : Union[str, Dict[str, float], None], optional, default=None
+        Bias the generation of AAs. Can be provided as:
+            - a string of comma-separated AA IDs and their biases: ``"A:-1.024,P:2.34,C:-12.34"``
+            - a dictionary mapping AA IDs to their biases: ``{"A": -1.024, "P": 2.34, "C": -12.34}``
+            - a file path to a JSON file containing a dictionary mapping AA IDs to their biases, which will be applied to all PDB files: ``{"A": -1.024, "P": 2.34, "C": -12.34}``
+            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of AA IDs and their biases: ``{"/path/to/a1b2.pdb": {"A": -1.024, "P": 2.34, "C": -12.34}}``
+
+    bias_aa_per_residue : Union[str, Dict[str, float], None], optional, default=None
+        Bias the generation of AAs per residue. Can be provided as:
+            - a string of comma-separated residue IDs and their biases: ``"A12:A:-1.024,P:2.34,C:-12.34"``
+            - a dictionary mapping residue IDs to their biases: ``{"A12": {"A": -1.024, "P": 2.34, "C": -12.34}}``
+            - a file path to a JSON file containing a dictionary mapping residue IDs to their biases, which will be applied to all PDB files: ``{"A12": {"A": -1.024, "P": 2.34, "C": -12.34}}``
+            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of residue IDs and their biases: ``{"/path/to/a1b2.pdb": {"A12": {"A": -1.024, "P": 2.34, "C": -12.34}}}``
+
+    omit_aa : Union[str, Dict[str, str], None], optional, default=None
+        Omit the generation of AAs. Can be provided as:
+            - a string of comma-separated AA IDs: ``"ACG"``
+            - a dictionary mapping AA IDs to their biases: ``{"A": "ACG"}``
+            - a file path to a JSON file containing a dictionary mapping AA IDs to their biases, which will be applied to all PDB files: ``{"A": "ACG"}``
+            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of AA IDs: ``{"/path/to/a1b2.pdb": {"A": "ACG"}}``
+
+    omit_aa_per_residue : Union[str, Dict[str, str], None], optional, default=None
+        Omit the generation of AAs per residue. Can be provided as:
+            - a string of comma-separated residue IDs: ``"A12:ACG"``
+            - a dictionary mapping residue IDs to their biases: ``{"A12": "ACG"}``
+            - a file path to a JSON file containing a dictionary mapping residue IDs to their biases, which will be applied to all PDB files: ``{"A12": "ACG"}``
+            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of residue IDs: ``{"/path/to/a1b2.pdb": {"A12": "ACG"}}``
+
+    fixed_residues : Union[str, Dict[str, str], None], optional, default=None
+        Fix residues at the provided positions (redesign all other residues). Can be provided as:
+            - a string of space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
+            - a list or tuple of residue IDs: ``["A12", "A13", "A14", "B2", "B25"]``
+            - a file path to a text file containing space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
+            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of residue IDs: ``{"/path/to/a1b2.pdb": "A12 A13 A14 B2 B25"}``
+
+    redesigned_residues : Union[str, Iterable, None], optional, default=None
+        Residues to redesign (all other residues will be fixed). Can be provided as:
+          - a string of space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
+          - a list or tuple of residue IDs: ``["A12", "A13", "A14", "B2", "B25"]``
+          - a file path to a text file containing space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
+          - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of residue IDs: ``{"/path/to/a1b2.pdb": "A12 A13 A14 B2 B25"}``
+
+    chains_to_design : Union[str, Iterable, None], optional, default=None
+        Chains to design. Can be provided as:
+            - a string of comma-separated chain IDs: ``"A,B,C"``
+            - a list or tuple of chain IDs: ``["A", "B", "C"]``
+            - a file path to a text file containing comma-separated chain IDs: ``"A,B,C"``
+            - a file path to a JSON file containing a dictionary mapping PDB file paths to comma-separated chain IDs: ``{"/path/to/a1b2.pdb": "A,B,C"}``
+
+    parse_these_chains_only : Union[str, Iterable, None], optional, default=None
+        Chains to parse. Can be provided as:
+            - a string of comma-separated chain IDs: ``"A,B,C"``
+            - a list or tuple of chain IDs: ``["A", "B", "C"]``
+            - a file path to a text file containing comma-separated chain IDs: ``"A,B,C"``
+            - a file path to a JSON file containing a dictionary mapping PDB file paths to comma-separated chain IDs: ``{"/path/to/a1b2.pdb": "A,B,C"}``
 
     use_side_chain_context : bool, optional, default=True
-        Whether to use side chain context. Only used if `model_type` is ``"ligand_mpnn"``.
+        Whether to use side chain context.
 
     use_atom_context : bool, optional, default=False
         Whether to use atom context. Only used if `model_type` is ``"ligand_mpnn"``.
@@ -157,10 +227,6 @@ def ligandmpnn(
 
     num_batches : int, optional, default=1
         Number of times to design sequences using the chosen `batch size`.
-
-    temperature : Union[float, Iterable], optional, default=0.1
-        Temperature(s) to use. If multiple temperature values are provided, each PDB file will be processed
-        with every combination of temperature and seed.
 
     redesigned_residues : Union[str, Iterable, None], optional, default=None
         Residues to redesign. Can be a string of space-separated residue IDs, a list of residue IDs,
@@ -177,6 +243,10 @@ def ligandmpnn(
 
     verbose : bool, optional, default=True
         Whether to print verbose output.
+
+
+    .. _LigandMPNN: https://www.biorxiv.org/content/10.1101/2023.12.22.573103v1
+
     """
     # PDB path(s)
     if isinstance(pdb_path, str):
@@ -219,16 +289,22 @@ def ligandmpnn(
             raise ValueError("No GPUs available")
     elif isinstance(gpus, int):
         gpus = [gpus]
+    elif isinstance(gpus, str):
+        gpus = [int(g) for g in gpus.split(",")]
 
     # seed(s)
     if isinstance(seed, int):
         seeds = [seed]
+    elif isinstance(seed, str):
+        seeds = [int(s) for s in seed.split(",")]
     else:
         seeds = sorted(seed)
 
     # temperature(s)
     if isinstance(temperature, float):
         temperatures = [temperature]
+    elif isinstance(temperature, str):
+        temperatures = [float(t) for t in temperature.split(",")]
     else:
         temperatures = sorted(temperature)
 
