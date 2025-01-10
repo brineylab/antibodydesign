@@ -270,6 +270,11 @@ def ligandmpnn(
     else:
         logger = abutils.log.null_logger()
 
+    print("started_from_cli", started_from_cli)
+    print("verbose", verbose)
+
+    if verbose and started_from_cli:
+        logger.info("\n")
     if verbose and started_from_cli:
         logger.info("\n")
         logger.info("==============")
