@@ -167,56 +167,56 @@ def ligandmpnn(
             - a string of comma-separated AA IDs and their biases: ``"A:-1.024,P:2.34,C:-12.34"``
             - a dictionary mapping AA IDs to their biases: ``{"A": -1.024, "P": 2.34, "C": -12.34}``
             - a file path to a JSON file containing a dictionary mapping AA IDs to their biases, which will be applied to all PDB files: ``{"A": -1.024, "P": 2.34, "C": -12.34}``
-            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of AA IDs and their biases: ``{"/path/to/a1b2.pdb": {"A": -1.024, "P": 2.34, "C": -12.34}}``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of AA IDs and their biases: ``{"a1b2.pdb": {"A": -1.024, "P": 2.34, "C": -12.34}}``
 
     bias_aa_per_residue : Union[str, Dict[str, float], None], optional, default=None
         Bias the generation of AAs per residue. Can be provided as:
             - a string of comma-separated residue IDs and their biases: ``"A12:A:-1.024,P:2.34,C:-12.34"``
             - a dictionary mapping residue IDs to their biases: ``{"A12": {"A": -1.024, "P": 2.34, "C": -12.34}}``
             - a file path to a JSON file containing a dictionary mapping residue IDs to their biases, which will be applied to all PDB files: ``{"A12": {"A": -1.024, "P": 2.34, "C": -12.34}}``
-            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of residue IDs and their biases: ``{"/path/to/a1b2.pdb": {"A12": {"A": -1.024, "P": 2.34, "C": -12.34}}}``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of residue IDs and their biases: ``{"a1b2.pdb": {"A12": {"A": -1.024, "P": 2.34, "C": -12.34}}}``
 
     omit_aa : Union[str, Dict[str, str], None], optional, default=None
         Omit the generation of AAs. Can be provided as:
             - a string of comma-separated AA IDs: ``"ACG"``
             - a dictionary mapping AA IDs to their biases: ``{"A": "ACG"}``
             - a file path to a JSON file containing a dictionary mapping AA IDs to their biases, which will be applied to all PDB files: ``{"A": "ACG"}``
-            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of AA IDs: ``{"/path/to/a1b2.pdb": {"A": "ACG"}}``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of AA IDs: ``{"a1b2.pdb": {"A": "ACG"}}``
 
     omit_aa_per_residue : Union[str, Dict[str, str], None], optional, default=None
         Omit the generation of AAs per residue. Can be provided as:
             - a string of comma-separated residue IDs: ``"A12:ACG"``
             - a dictionary mapping residue IDs to their biases: ``{"A12": "ACG"}``
             - a file path to a JSON file containing a dictionary mapping residue IDs to their biases, which will be applied to all PDB files: ``{"A12": "ACG"}``
-            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of residue IDs: ``{"/path/to/a1b2.pdb": {"A12": "ACG"}}``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of residue IDs: ``{"a1b2.pdb": {"A12": "ACG"}}``
 
     fixed_residues : Union[str, Dict[str, str], None], optional, default=None
         Fix residues at the provided positions (redesign all other residues). Can be provided as:
             - a string of space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
             - a list or tuple of residue IDs: ``["A12", "A13", "A14", "B2", "B25"]``
             - a file path to a text file containing space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
-            - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of residue IDs: ``{"/path/to/a1b2.pdb": "A12 A13 A14 B2 B25"}``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of residue IDs: ``{"a1b2.pdb": "A12 A13 A14 B2 B25"}``
 
     redesigned_residues : Union[str, Iterable, None], optional, default=None
         Residues to redesign (all other residues will be fixed). Can be provided as:
           - a string of space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
           - a list or tuple of residue IDs: ``["A12", "A13", "A14", "B2", "B25"]``
           - a file path to a text file containing space-separated residue IDs: ``"A12 A13 A14 B2 B25"``
-          - a file path to a JSON file containing a dictionary mapping PDB file paths to dictionaries of residue IDs: ``{"/path/to/a1b2.pdb": "A12 A13 A14 B2 B25"}``
+          - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to dictionaries of residue IDs: ``{"a1b2.pdb": "A12 A13 A14 B2 B25"}``
 
     chains_to_design : Union[str, Iterable, None], optional, default=None
         Chains to design. Can be provided as:
             - a string of comma-separated chain IDs: ``"A,B,C"``
             - a list or tuple of chain IDs: ``["A", "B", "C"]``
             - a file path to a text file containing comma-separated chain IDs: ``"A,B,C"``
-            - a file path to a JSON file containing a dictionary mapping PDB file paths to comma-separated chain IDs: ``{"/path/to/a1b2.pdb": "A,B,C"}``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to comma-separated chain IDs: ``{"a1b2.pdb": "A,B,C"}``
 
     parse_these_chains_only : Union[str, Iterable, None], optional, default=None
         Chains to parse. Can be provided as:
             - a string of comma-separated chain IDs: ``"A,B,C"``
             - a list or tuple of chain IDs: ``["A", "B", "C"]``
             - a file path to a text file containing comma-separated chain IDs: ``"A,B,C"``
-            - a file path to a JSON file containing a dictionary mapping PDB file paths to comma-separated chain IDs: ``{"/path/to/a1b2.pdb": "A,B,C"}``
+            - a file path to a JSON file containing a dictionary mapping PDB file names (not the full path) to comma-separated chain IDs: ``{"a1b2.pdb": "A,B,C"}``
 
     use_side_chain_context : bool, optional, default=True
         Whether to use side chain context.
@@ -229,13 +229,6 @@ def ligandmpnn(
 
     num_batches : int, optional, default=1
         Number of times to design sequences using the chosen `batch size`.
-
-    redesigned_residues : Union[str, Iterable, None], optional, default=None
-        Residues to redesign. Can be a string of space-separated residue IDs, a list of residue IDs,
-        or a JSON file mapping PDB file paths to residue IDs.
-          - If a string, it will be applied to all PDBs: ``"A12 A13 A14 B2 B25"``
-          - If a list, it will be applied to all PDBs: ``["A12", "A13", "A14", "B2", "B25"]``
-          - If a JSON file, it will be applied to the PDB file specified by the key: ``{"a1b2.pdb": "A12 A13 A14 B2 B25"}``
 
     weights_path : Optional[str], optional, default=None
         Path to the weights file.
@@ -261,6 +254,7 @@ def ligandmpnn(
     pdbs = [os.path.abspath(pdb) for pdb in pdbs if os.path.isfile(pdb)]
     if len(pdbs) == 0:
         raise FileNotFoundError(f"No PDB files found in {pdb_path}")
+    pdb_names = [os.path.basename(pdb).rstrip(".pdb") for pdb in pdbs]
 
     # output directory
     abutils.io.make_dir(output_dir)
@@ -320,18 +314,18 @@ def ligandmpnn(
 
     # chains
     chains_to_design = _process_chain_or_residue_data(
-        chains_to_design, pdbs=pdbs, sep=","
+        chains_to_design, pdbs=pdb_names, sep=","
     )
     parse_these_chains_only = _process_chain_or_residue_data(
-        parse_these_chains_only, pdbs=pdbs, sep=","
+        parse_these_chains_only, pdbs=pdb_names, sep=","
     )
 
     # fixed/redesigned residues
     fixed_residues_dict = _process_chain_or_residue_data(
-        fixed_residues, pdbs=pdbs, sep=" "
+        fixed_residues, pdbs=pdb_names, sep=" "
     )
     redesigned_residues_dict = _process_chain_or_residue_data(
-        redesigned_residues, pdbs=pdbs, sep=" "
+        redesigned_residues, pdbs=pdb_names, sep=" "
     )
 
     # bias AA
@@ -340,8 +334,10 @@ def ligandmpnn(
 
     # bias AA per residue
     # returns a dict with PDB file paths as keys and per-residue bias AA data as values
-    bias_aa_per_residue_dict = _process_per_residue_data(bias_aa_per_residue)
-    if not all([pdb in bias_aa_per_residue_dict for pdb in pdbs]):
+    bias_aa_per_residue_dict = _process_per_residue_data(
+        bias_aa_per_residue, pdbs=pdb_names
+    )
+    if not all([pdb in bias_aa_per_residue_dict for pdb in pdb_names]):
         raise ValueError(
             f"Supplied bias_aa_per_residue ({bias_aa_per_residue}) does not have information for all input PDB files"
         )
@@ -352,8 +348,10 @@ def ligandmpnn(
 
     # omit AA per residue
     # returns a dict with PDB file paths as keys and per-residue omit AA data as values
-    omit_aa_per_residue_dict = _process_per_residue_data(omit_aa_per_residue)
-    if not all([pdb in omit_aa_per_residue_dict for pdb in pdbs]):
+    omit_aa_per_residue_dict = _process_per_residue_data(
+        omit_aa_per_residue, pdbs=pdb_names
+    )
+    if not all([pdb in omit_aa_per_residue_dict for pdb in pdb_names]):
         raise ValueError(
             f"Supplied omit_aa_per_residue ({omit_aa_per_residue}) does not have information for all input PDB files"
         )
@@ -391,15 +389,17 @@ def ligandmpnn(
                         model_checkpoint=checkpoint_path,
                         seed=seed,
                         temperature=temperature,
-                        fixed_residues=fixed_residues_dict.get(pdb, None),
-                        redesigned_residues=redesigned_residues_dict.get(pdb, None),
+                        fixed_residues=fixed_residues_dict.get(pdb_name, None),
+                        redesigned_residues=redesigned_residues_dict.get(
+                            pdb_name, None
+                        ),
                         bias_aa=bias_aa,
                         bias_aa_per_residue_dict=bias_aa_per_residue_dict.get(
-                            pdb, None
+                            pdb_name, None
                         ),
                         omit_aa=omit_aa,
                         omit_aa_per_residue_dict=omit_aa_per_residue_dict.get(
-                            pdb, None
+                            pdb_name, None
                         ),
                         chains_to_design=chains_to_design,
                         parse_these_chains_only=parse_these_chains_only,
@@ -514,7 +514,7 @@ def _process_chain_or_residue_data(
             - a list or tuple of chain or residue IDs
 
     pdbs : Iterable
-        List of PDB file paths.
+        List of PDB names.
 
     sep : str, default=" "
         Separator to be used when compiling a string representation of chain or residue data from an Iterable.
@@ -561,7 +561,7 @@ def _process_per_residue_data(
         Per-residue data.
 
     pdbs : Iterable
-        List of PDB file paths.
+        List of PDB names.
 
     Returns
     -------
