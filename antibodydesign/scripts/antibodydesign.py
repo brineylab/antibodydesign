@@ -144,6 +144,12 @@ def cli():
     default=False,
     help="Print verbose output.",
 )
+@click.option(
+    "--debug",
+    type=bool,
+    default=False,
+    help="Print debug output.",
+)
 def ligandmpnn(
     pdb_path: str,
     output_dir: str,
@@ -166,6 +172,7 @@ def ligandmpnn(
     num_batches: int = 1,
     save_stats: bool = True,
     verbose: bool = False,
+    debug: bool = False,
 ):
     run_ligandmpnn(
         pdb_path=pdb_path,
@@ -189,4 +196,6 @@ def ligandmpnn(
         num_batches=num_batches,
         save_stats=save_stats,
         verbose=verbose,
+        debug=debug,
+        started_from_cli=True,
     )

@@ -112,7 +112,9 @@ def ligandmpnn(
     batch_size: int = 32,
     num_batches: int = 1,
     save_stats: bool = True,
-    verbose: bool = False,
+    started_from_cli: bool = False,
+    verbose: bool = True,
+    debug: bool = False,
 ):
     """
     Run LigandMPNN_ on a PDB file, a list of PDB files, or a directory of PDB files.
@@ -235,8 +237,14 @@ def ligandmpnn(
     save_stats : bool, optional, default=True
         Whether to save the stats.
 
-    verbose : bool, optional, default=True
+    started_from_cli : bool, optional, default=False
+        Whether the function was called from the CLI.
+
+    verbose : bool, optional, default=False
         Whether to print verbose output.
+
+    debug : bool, optional, default=False
+        Whether to print additional output potentially useful for debugging.
 
 
     .. _LigandMPNN: https://www.biorxiv.org/content/10.1101/2023.12.22.573103v1
@@ -362,6 +370,25 @@ def ligandmpnn(
     for gpu in gpus:
         gpu_queue.put(gpu)
 
+    # setup logging
+    global logger
+    if started_from_cli:
+        abutils.log.setup_logging(
+            logfile=os.path.join(output_dir, "ligandmpnn.log"),
+            add_stream_handler=verbose,
+            single_line_handler=True,
+            debug=debug,
+        )
+        logger = abutils.log.get_logger()
+    elif verbose:
+        logger = abutils.log.NotebookLogger(verbose=verbose, end="")
+    else:
+        logger = abutils.log.null_logger()
+
+    # log PDB file info (only if started from CLI)
+    if started_from_cli:
+        log_pdb_file_info(pdbs=pdbs)
+
     # run
     futures = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(gpus)) as executor:
@@ -429,7 +456,7 @@ def ligandmpnn(
                 pbar.update(1)
 
 
-def log_params(params: LigandMPNNParameters):
+def log_params(params: LigandMPNNParameters) -> None:
     param_str = ""
     param_str += f"PDB_PATH: {params.pdb_path}\n"
     param_str += f"OUTPUT_DIR: {params.output_dir}\n"
@@ -449,6 +476,22 @@ def log_params(params: LigandMPNNParameters):
     param_str += f"VERBOSE: {params.verbose}\n"
     with open(os.path.join(params.output_dir, "params.txt"), "w") as f:
         f.write(param_str)
+
+
+def log_pdb_file_info(pdbs: Iterable[str]) -> None:
+    num_files = len(pdbs)
+    plural = "s" if num_files > 1 else ""
+    logger.info("\n\n\n")
+    logger.info("INPUT FILES\n")
+    logger.info("===========\n")
+    logger.info(f"found {num_files} input PDB file{plural}:\n")
+    if num_files < 6:
+        for pdb in pdbs:
+            logger.info(f"  {os.path.basename(pdb)}\n")
+    else:
+        for pdb in pdbs[:5]:
+            logger.info(f"  {os.path.basename(pdb)}\n")
+        logger.info(f"  ... and {num_files - 5} more\n")
 
 
 def gpu_worker(
@@ -495,7 +538,7 @@ def _get_ligandmpnn_cmd(
     cmd += f" --ligand_mpnn_use_atom_context {int(params.use_atom_context)}"
     # misc
     cmd += f" --save_stats {int(params.save_stats)}"
-    cmd += f" --verbose {int(params.verbose)}"
+    cmd += " --verbose 0"
 
     return cmd
 
