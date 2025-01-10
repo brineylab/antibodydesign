@@ -109,14 +109,12 @@ def cli():
     help="Provide chains to parse. Can be a string of comma-separated chain IDs (for example 'A,B,C'), the path to a text file containing comma-separated chain IDs that will be aplied to all input PDBs, or a file path to a JSON file mapping PDB file paths to comma-separated chain IDs.",
 )
 @click.option(
-    "--use_side_chain_context",
-    type=bool,
+    "--use_side_chain_context/--no_use_side_chain_context",
     default=True,
     help="Use side chain context for generation.",
 )
 @click.option(
-    "--use_atom_context",
-    type=bool,
+    "--use_atom_context/--no_use_atom_context",
     default=False,
     help="Use atom context for generation.",
 )
@@ -133,20 +131,18 @@ def cli():
     help="Number of times to design sequences using the chosen `batch size`.",
 )
 @click.option(
-    "--save_stats",
-    type=bool,
+    "--save_stats/--no_save_stats",
     default=True,
-    help="Save the stats.",
+    help="Whether to save the stats.",
 )
 @click.option(
-    "--verbose",
-    type=bool,
-    default=False,
-    help="Print verbose output.",
+    "--verbose/--quiet",
+    default=True,
+    help="Print verbose output",
 )
 @click.option(
     "--debug",
-    type=bool,
+    is_flag=True,
     default=False,
     help="Print debug output.",
 )
@@ -171,7 +167,7 @@ def ligandmpnn(
     batch_size: int = 32,
     num_batches: int = 1,
     save_stats: bool = True,
-    verbose: bool = False,
+    verbose: bool = True,
     debug: bool = False,
 ):
     run_ligandmpnn(
