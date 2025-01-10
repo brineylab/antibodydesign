@@ -38,14 +38,14 @@ def cli():
     "--model_checkpoint",
     type=str,
     default=None,
-    help="Checkpoint of the model to use, excluding the model name and file extension. For example, if the full name of the weights file for the desired model checkpoint is 'ligandmpnn_v_32_10_25.pt', then `model_checkpoint` should be 'v_32_10_25'.",
+    help="Checkpoint of the model to use, excluding the model name and file extension. \nFor example, if the full name of the weights file for the desired model checkpoint is 'ligandmpnn_v_32_10_25.pt', then `model_checkpoint` should be 'v_32_10_25'.",
 )
 @click.option(
     "-s",
     "--seed",
     type=int,
     default=42,
-    help="Random seed(s) to use, for example '42' or '42,43'. If multiple seed values are provided, each PDB file will be processed with every combination of temperature and seed.",
+    help="Random seed(s) to use, for example '42' or '42,43'. \nIf multiple seed values are provided, each PDB file will be processed with every combination of temperature and seed.",
 )
 @click.option(
     "g",
@@ -59,7 +59,7 @@ def cli():
     "--temperature",
     type=float,
     default=0.1,
-    help="Temperature(s) to use, for example '0.1' or '0.1,0.2'. If multiple temperature values are provided, each PDB file will be processed with every combination of temperature and seed.",
+    help="Temperature(s) to use, for example '0.1' or '0.1,0.2'. \nIf multiple temperature values are provided, each PDB file will be processed with every combination of temperature and seed.",
 )
 @click.option(
     "--bias_aa",
@@ -71,7 +71,7 @@ def cli():
     "--bias_aa_per_residue",
     type=str,
     default=None,
-    help="Path to a JSON file containing per-residue AA biases, for example {'A12': {'G': -0.3, 'C': -2.0, 'H': 0.8}, 'A13': {'G': -1.3}}. Alternatively, provide a JSON file containing per-pdb-file per-residue AA biases, for example {'/path/to/pdb': {'A12': {'G': -0.3, 'C': -2.0, 'H': 0.8}, 'A13': {'G': -1.3}}}.",
+    help="Path to a JSON file containing per-residue AA biases, for example {'A12': {'G': -0.3, 'C': -2.0, 'H': 0.8}, 'A13': {'G': -1.3}}. \nAlternatively, provide a JSON file containing per-pdb-file per-residue AA biases, for example {'/path/to/pdb': {'A12': {'G': -0.3, 'C': -2.0, 'H': 0.8}, 'A13': {'G': -1.3}}}.",
 )
 @click.option(
     "--omit_aa",
