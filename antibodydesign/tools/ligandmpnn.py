@@ -359,10 +359,12 @@ def ligandmpnn(
     futures = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(gpus)) as executor:
         for pdb in pdbs:
+            # copy input PDB to the output directory
             pdb_name = os.path.basename(pdb).rstrip(".pdb")
             pdb_output_dir = os.path.join(output_dir, pdb_name)
             abutils.io.make_dir(pdb_output_dir)
             shutil.copy(pdb, pdb_output_dir)
+            # run
             for temperature in temperatures:
                 for seed in seeds:
                     # set up output directory
