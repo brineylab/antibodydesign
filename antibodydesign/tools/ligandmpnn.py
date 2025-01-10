@@ -414,6 +414,13 @@ def ligandmpnn(
                     log_params(params)
                     # get cmd
                     cmd = _get_ligandmpnn_cmd(params=params)
+
+                    #
+                    #
+                    print(f"\n\n\n{cmd}\n\n\n")
+                    #
+                    #
+
                     # submit cmd to thread pool
                     futures.append(executor.submit(gpu_worker, cmd, gpu_queue))
         # monitor progress
