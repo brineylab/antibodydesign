@@ -376,7 +376,7 @@ def ligandmpnn(
         abutils.log.setup_logging(
             logfile=os.path.join(output_dir, "ligandmpnn.log"),
             add_stream_handler=verbose,
-            single_line_handler=True,
+            single_line_handler=False,
             debug=debug,
         )
         logger = abutils.log.get_logger()
@@ -481,17 +481,17 @@ def log_params(params: LigandMPNNParameters) -> None:
 def log_pdb_file_info(pdbs: Iterable[str]) -> None:
     num_files = len(pdbs)
     plural = "s" if num_files > 1 else ""
-    logger.info("\n\n\n")
-    logger.info("INPUT FILES\n")
-    logger.info("===========\n")
-    logger.info(f"found {num_files} input PDB file{plural}:\n")
+    logger.info("\n\n")
+    logger.info("INPUT FILES")
+    logger.info("===========")
+    logger.info(f"found {num_files} input PDB file{plural}:")
     if num_files < 6:
         for pdb in pdbs:
-            logger.info(f"  {os.path.basename(pdb)}\n")
+            logger.info(f"  {os.path.basename(pdb)}")
     else:
         for pdb in pdbs[:5]:
-            logger.info(f"  {os.path.basename(pdb)}\n")
-        logger.info(f"  ... and {num_files - 5} more\n")
+            logger.info(f"  {os.path.basename(pdb)}")
+        logger.info(f"  ... and {num_files - 5} more")
 
 
 def gpu_worker(
