@@ -250,6 +250,30 @@ def ligandmpnn(
     .. _LigandMPNN: https://www.biorxiv.org/content/10.1101/2023.12.22.573103v1
 
     """
+    # output directory
+    abutils.io.make_dir(output_dir)
+
+    # setup logging
+    global logger
+    if started_from_cli:
+        abutils.log.setup_logging(
+            logfile=os.path.join(output_dir, "ligandmpnn.log"),
+            add_stream_handler=True,
+            single_line_handler=False,
+            debug=debug,
+        )
+        logger = abutils.log.get_logger()
+    elif verbose:
+        logger = abutils.log.NotebookLogger(verbose=verbose, end="")
+    else:
+        logger = abutils.log.null_logger()
+    if verbose and started_from_cli:
+        logger.info("\n")
+        logger.info("==============")
+        logger.info("  LIGANDMPNN  ")
+        logger.info("==============")
+        logger.info("\n")
+
     # PDB path(s)
     if isinstance(pdb_path, str):
         if os.path.isdir(pdb_path):
@@ -263,8 +287,9 @@ def ligandmpnn(
         raise FileNotFoundError(f"No PDB files found in {pdb_path}")
     pdb_names = [os.path.basename(pdb).rstrip(".pdb") for pdb in pdbs]
 
-    # output directory
-    abutils.io.make_dir(output_dir)
+    # log PDB file info (only if started from CLI)
+    if started_from_cli:
+        log_pdb_file_info(pdbs=pdb_names)
 
     # model
     model_type = model_type.lower()
@@ -369,25 +394,6 @@ def ligandmpnn(
     gpu_queue = queue.Queue()
     for gpu in gpus:
         gpu_queue.put(gpu)
-
-    # setup logging
-    global logger
-    if started_from_cli:
-        abutils.log.setup_logging(
-            logfile=os.path.join(output_dir, "ligandmpnn.log"),
-            add_stream_handler=True,
-            single_line_handler=False,
-            debug=debug,
-        )
-        logger = abutils.log.get_logger()
-    elif verbose:
-        logger = abutils.log.NotebookLogger(verbose=verbose, end="")
-    else:
-        logger = abutils.log.null_logger()
-
-    # log PDB file info (only if started from CLI)
-    if started_from_cli:
-        log_pdb_file_info(pdbs=pdbs)
 
     # run
     futures = []
