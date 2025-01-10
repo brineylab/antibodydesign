@@ -423,7 +423,7 @@ def ligandmpnn(
         with tqdm(
             total=len(futures),
             desc="LigandMPNN",
-            bar_format="{desc:<2.5}{percentage:3.0f}%|{bar:25}{r_bar}",
+            bar_format="{desc}{percentage:3.0f}%|{bar:25}{r_bar}",
         ) as pbar:
             for _ in concurrent.futures.as_completed(futures):
                 pbar.update(1)
