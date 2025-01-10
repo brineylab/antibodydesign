@@ -1,0 +1,20 @@
+include README.md
+include LICENSE
+include requirements*
+
+include antibodydesign/data/*
+include antibodydesign/scripts/*
+include antibodydesign/tools/*
+
+include antibodydesign/models/*
+include antibodydesign/models/LigandMPNN/*
+include antibodydesign/models/LigandMPNN/inputs/*
+include antibodydesign/models/LigandMPNN/model_params/*
+include antibodydesign/models/LigandMPNN/openfold/*
+include antibodydesign/models/LigandMPNN/openfold/data/*
+include antibodydesign/models/LigandMPNN/openfold/data/tools/*
+include antibodydesign/models/LigandMPNN/openfold/np/*
+include antibodydesign/models/LigandMPNN/openfold/np/relax/*
+include antibodydesign/models/LigandMPNN/openfold/resources/*
+include antibodydesign/models/LigandMPNN/openfold/utils/*
+include antibodydesign/models/LigandMPNN/training/*
