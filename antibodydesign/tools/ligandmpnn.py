@@ -602,6 +602,7 @@ def _get_model_checkpoint(model_type: str, model_checkpoint: str) -> str:
     str
         Path to the model checkpoint.
     """
+    model_type = model_type.lower().replace("_", "")
     model_params_dir = os.path.join(LIGAND_MPNN_DIR, "model_params")
     model_checkpoint_path = os.path.join(
         model_params_dir, f"{model_type}_{model_checkpoint}.pt"
