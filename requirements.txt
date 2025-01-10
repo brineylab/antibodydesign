@@ -1,5 +1,6 @@
 abutils
 click
+magika
 natsort
 numpy
 prody
