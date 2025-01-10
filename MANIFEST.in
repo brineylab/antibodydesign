@@ -2,7 +2,6 @@ include README.md
 include LICENSE
 include requirements*
 
-include antibodydesign/data/*
 include antibodydesign/scripts/*
 include antibodydesign/tools/*
 
