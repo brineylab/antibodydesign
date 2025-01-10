@@ -258,15 +258,18 @@ def ligandmpnn(
     if started_from_cli:
         abutils.log.setup_logging(
             logfile=os.path.join(output_dir, "ligandmpnn.log"),
-            add_stream_handler=True,
+            add_stream_handler=verbose,
             single_line_handler=False,
             debug=debug,
         )
-        logger = abutils.log.get_logger()
+        logger = abutils.log.get_logger(
+            add_stream_handler=verbose, single_line_handler=False
+        )
     elif verbose:
         logger = abutils.log.NotebookLogger(verbose=verbose, end="")
     else:
         logger = abutils.log.null_logger()
+
     if verbose and started_from_cli:
         logger.info("\n")
         logger.info("==============")
