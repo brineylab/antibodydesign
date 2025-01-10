@@ -19,13 +19,13 @@ def cli():
     "pdb_path",
     type=str,
     required=True,
-    help="Path to the input PDB file or a directory of PDB files.",
+    # help="Path to the input PDB file or a directory of PDB files.",
 )
 @click.argument(
     "output_dir",
     type=str,
     required=True,
-    help="Path to the output directory. It will be created if it does not exist.",
+    # help="Path to the output directory. It will be created if it does not exist.",
 )
 @click.option(
     "-m",
