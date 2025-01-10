@@ -112,7 +112,7 @@ def ligandmpnn(
     batch_size: int = 32,
     num_batches: int = 1,
     save_stats: bool = True,
-    verbose: bool = True,
+    verbose: bool = False,
 ):
     """
     Run LigandMPNN_ on a PDB file, a list of PDB files, or a directory of PDB files.
@@ -493,15 +493,11 @@ def _get_ligandmpnn_cmd(
     if params.parse_these_chains_only is not None:
         cmd += f' --parse_these_chains_only "{params.parse_these_chains_only}"'
     # all-atom
-    if params.use_side_chain_context:
-        cmd += " --ligand_mpnn_use_side_chain_context 1"
-    if params.use_atom_context:
-        cmd += " --ligand_mpnn_use_atom_context 1"
+    cmd += f" --ligand_mpnn_use_side_chain_context {int(params.use_side_chain_context)}"
+    cmd += f" --ligand_mpnn_use_atom_context {int(params.use_atom_context)}"
     # misc
-    if params.save_stats:
-        cmd += " --save_stats 1"
-    if params.verbose:
-        cmd += " --verbose 1"
+    cmd += f" --save_stats {int(params.save_stats)}"
+    cmd += f" --verbose {int(params.verbose)}"
 
     return cmd
 

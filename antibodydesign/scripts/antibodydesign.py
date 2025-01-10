@@ -141,7 +141,7 @@ def cli():
 @click.option(
     "--verbose",
     type=bool,
-    default=True,
+    default=False,
     help="Print verbose output.",
 )
 def ligandmpnn(
@@ -165,7 +165,7 @@ def ligandmpnn(
     batch_size: int = 32,
     num_batches: int = 1,
     save_stats: bool = True,
-    verbose: bool = True,
+    verbose: bool = False,
 ):
     run_ligandmpnn(
         pdb_path=pdb_path,
