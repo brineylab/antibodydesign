@@ -273,13 +273,11 @@ def ligandmpnn(
         logger = abutils.log.null_logger()
 
     if verbose and started_from_cli:
-        logger.info("\n")
-    if verbose and started_from_cli:
-        logger.info("\n")
+        logger.info("")
         logger.info("==============")
         logger.info("  LIGANDMPNN  ")
         logger.info("==============")
-        logger.info("\n")
+        logger.info("")
 
     # PDB path(s)
     if isinstance(pdb_path, str):
@@ -494,7 +492,7 @@ def log_params(params: LigandMPNNParameters) -> None:
 def log_pdb_file_info(pdbs: Iterable[str]) -> None:
     num_files = len(pdbs)
     plural = "s" if num_files > 1 else ""
-    logger.info("\n\n")
+    logger.info("")
     logger.info("INPUT FILES")
     logger.info("===========")
     logger.info(f"found {num_files} input PDB file{plural}:")
@@ -505,6 +503,7 @@ def log_pdb_file_info(pdbs: Iterable[str]) -> None:
         for pdb in pdbs[:5]:
             logger.info(f"  {os.path.basename(pdb)}")
         logger.info(f"  ... and {num_files - 5} more")
+    logger.info("")
 
 
 def gpu_worker(
