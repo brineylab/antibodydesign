@@ -538,7 +538,7 @@ def log_arguments(
     output_dir: str,
     model_type: str,
     model_checkpoint: str,
-    seed: int,
+    seed: Union[int, str, Iterable[int]],
     temperature: Union[float, str, Iterable[float]],
     gpus: Union[int, str, Iterable[int]],
     bias_aa: Union[str, Dict[str, str]],
@@ -561,29 +561,29 @@ def log_arguments(
     logger.info("")
     logger.info("ARGUMENTS")
     logger.info("=========")
-    logger.info("PDB_PATH:", pdb_path)
-    logger.info("OUTPUT_DIR:", output_dir)
-    logger.info("MODEL_TYPE:", model_type)
-    logger.info("MODEL_CHECKPOINT:", model_checkpoint)
-    logger.info("SEED:", seed)
-    logger.info("TEMPERATURE:", temperature)
-    logger.info("GPUS:", gpus)
-    logger.info("BIAS_AA:", bias_aa)
-    logger.info("BIAS_AA_PER_RESIDUE:", bias_aa_per_residue)
-    logger.info("OMIT_AA:", omit_aa)
-    logger.info("OMIT_AA_PER_RESIDUE:", omit_aa_per_residue)
-    logger.info("FIXED_RESIDUES:", fixed_residues)
-    logger.info("REDESIGNED_RESIDUES:", redesigned_residues)
-    logger.info("CHAINS_TO_DESIGN:", chains_to_design)
-    logger.info("PARSE_THESE_CHAINS_ONLY:", parse_these_chains_only)
-    logger.info("USE_SIDE_CHAIN_CONTEXT:", use_side_chain_context)
-    logger.info("USE_ATOM_CONTEXT:", use_atom_context)
-    logger.info("BATCH_SIZE:", batch_size)
-    logger.info("NUM_BATCHES:", num_batches)
-    logger.info("SAVE_STATS:", save_stats)
-    logger.info("STARTED_FROM_CLI:", started_from_cli)
-    logger.info("VERBOSE:", verbose)
-    logger.info("DEBUG:", debug)
+    logger.info("PDB_PATH:", str(pdb_path))
+    logger.info("OUTPUT_DIR:", str(output_dir))
+    logger.info("MODEL_TYPE:", str(model_type))
+    logger.info("MODEL_CHECKPOINT:", str(model_checkpoint))
+    logger.info("SEED:", str(seed))
+    logger.info("TEMPERATURE:", str(temperature))
+    logger.info("GPUS:", str(gpus))
+    logger.info("BIAS_AA:", str(bias_aa))
+    logger.info("BIAS_AA_PER_RESIDUE:", str(bias_aa_per_residue))
+    logger.info("OMIT_AA:", str(omit_aa))
+    logger.info("OMIT_AA_PER_RESIDUE:", str(omit_aa_per_residue))
+    logger.info("FIXED_RESIDUES:", str(fixed_residues))
+    logger.info("REDESIGNED_RESIDUES:", str(redesigned_residues))
+    logger.info("CHAINS_TO_DESIGN:", str(chains_to_design))
+    logger.info("PARSE_THESE_CHAINS_ONLY:", str(parse_these_chains_only))
+    logger.info("USE_SIDE_CHAIN_CONTEXT:", str(use_side_chain_context))
+    logger.info("USE_ATOM_CONTEXT:", str(use_atom_context))
+    logger.info("BATCH_SIZE:", str(batch_size))
+    logger.info("NUM_BATCHES:", str(num_batches))
+    logger.info("SAVE_STATS:", str(save_stats))
+    logger.info("STARTED_FROM_CLI:", str(started_from_cli))
+    logger.info("VERBOSE:", str(verbose))
+    logger.info("DEBUG:", str(debug))
     logger.info("")
 
 
