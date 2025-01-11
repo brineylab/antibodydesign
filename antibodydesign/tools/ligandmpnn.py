@@ -273,11 +273,12 @@ def ligandmpnn(
         logger = abutils.log.null_logger()
 
     if verbose and started_from_cli:
-        logger.info("")
-        logger.info("==============")
-        logger.info("  LIGANDMPNN  ")
-        logger.info("==============")
-        logger.info("")
+        log_splash()
+        # logger.info("")
+        # logger.info("==============")
+        # logger.info("  LIGANDMPNN  ")
+        # logger.info("==============")
+        # logger.info("")
 
     # PDB path(s)
     if isinstance(pdb_path, str):
@@ -504,6 +505,17 @@ def log_pdb_file_info(pdbs: Iterable[str]) -> None:
             logger.info(f"  {os.path.basename(pdb)}")
         logger.info(f"  ... and {num_files - 5} more")
     logger.info("")
+
+
+def log_splash():
+    splash = """
+   __   _                   ____  ______  _  ___  __
+  / /  (_)__ ____ ____  ___/ /  |/  / _ \/ |/ / |/ /
+ / /__/ / _ `/ _ `/ _ \/ _  / /|_/ / ___/    /    / 
+/____/_/\_, /\_,_/_//_/\_,_/_/  /_/_/  /_/|_/_/|_/  
+       /___/                                        
+"""
+    logger.info(splash)
 
 
 def gpu_worker(
