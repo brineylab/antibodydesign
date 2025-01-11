@@ -260,6 +260,7 @@ def ligandmpnn(
             logfile=os.path.join(output_dir, "ligandmpnn.log"),
             add_stream_handler=verbose,
             single_line_handler=False,
+            print_log_location=False,
             debug=debug,
         )
         logger = abutils.log.get_logger(
@@ -274,6 +275,31 @@ def ligandmpnn(
 
     if verbose and started_from_cli:
         log_splash()
+        log_arguments(
+            pdb_path=pdb_path,
+            output_dir=output_dir,
+            model_type=model_type,
+            model_checkpoint=model_checkpoint,
+            seed=seed,
+            temperature=temperature,
+            gpus=gpus,
+            bias_aa=bias_aa,
+            bias_aa_per_residue=bias_aa_per_residue,
+            omit_aa=omit_aa,
+            omit_aa_per_residue=omit_aa_per_residue,
+            fixed_residues=fixed_residues,
+            redesigned_residues=redesigned_residues,
+            chains_to_design=chains_to_design,
+            parse_these_chains_only=parse_these_chains_only,
+            use_side_chain_context=use_side_chain_context,
+            use_atom_context=use_atom_context,
+            batch_size=batch_size,
+            num_batches=num_batches,
+            save_stats=save_stats,
+            started_from_cli=started_from_cli,
+            verbose=verbose,
+            debug=debug,
+        )
         # logger.info("")
         # logger.info("==============")
         # logger.info("  LIGANDMPNN  ")
@@ -504,6 +530,60 @@ def log_pdb_file_info(pdbs: Iterable[str]) -> None:
         for pdb in pdbs[:5]:
             logger.info(f"  {os.path.basename(pdb)}")
         logger.info(f"  ... and {num_files - 5} more")
+    logger.info("")
+
+
+def log_arguments(
+    pdb_path: str,
+    output_dir: str,
+    model_type: str,
+    model_checkpoint: str,
+    seed: int,
+    temperature: Union[float, str, Iterable[float]],
+    gpus: Union[int, str, Iterable[int]],
+    bias_aa: Union[str, Dict[str, str]],
+    bias_aa_per_residue: Union[str, Dict[str, str]],
+    omit_aa: Union[str, Iterable[str]],
+    omit_aa_per_residue: Union[str, Dict[str, str]],
+    fixed_residues: Union[str, Dict[str, str]],
+    redesigned_residues: Union[str, Dict[str, str]],
+    chains_to_design: Union[str, Dict[str, str]],
+    parse_these_chains_only: Union[str, Dict[str, str]],
+    use_side_chain_context: bool,
+    use_atom_context: bool,
+    batch_size: int,
+    num_batches: int,
+    save_stats: bool,
+    started_from_cli: bool,
+    verbose: bool,
+    debug: bool,
+):
+    logger.info("")
+    logger.info("ARGUMENTS")
+    logger.info("=========")
+    logger.info("PDB_PATH:", pdb_path)
+    logger.info("OUTPUT_DIR:", output_dir)
+    logger.info("MODEL_TYPE:", model_type)
+    logger.info("MODEL_CHECKPOINT:", model_checkpoint)
+    logger.info("SEED:", seed)
+    logger.info("TEMPERATURE:", temperature)
+    logger.info("GPUS:", gpus)
+    logger.info("BIAS_AA:", bias_aa)
+    logger.info("BIAS_AA_PER_RESIDUE:", bias_aa_per_residue)
+    logger.info("OMIT_AA:", omit_aa)
+    logger.info("OMIT_AA_PER_RESIDUE:", omit_aa_per_residue)
+    logger.info("FIXED_RESIDUES:", fixed_residues)
+    logger.info("REDESIGNED_RESIDUES:", redesigned_residues)
+    logger.info("CHAINS_TO_DESIGN:", chains_to_design)
+    logger.info("PARSE_THESE_CHAINS_ONLY:", parse_these_chains_only)
+    logger.info("USE_SIDE_CHAIN_CONTEXT:", use_side_chain_context)
+    logger.info("USE_ATOM_CONTEXT:", use_atom_context)
+    logger.info("BATCH_SIZE:", batch_size)
+    logger.info("NUM_BATCHES:", num_batches)
+    logger.info("SAVE_STATS:", save_stats)
+    logger.info("STARTED_FROM_CLI:", started_from_cli)
+    logger.info("VERBOSE:", verbose)
+    logger.info("DEBUG:", debug)
     logger.info("")
 
 
