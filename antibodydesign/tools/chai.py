@@ -36,7 +36,7 @@ def chai1(
     started_from_cli: bool = False,
 ) -> None:
     """
-    Run Chai1 inference.
+    Run inference with `Chai-1`_.
 
     Parameters
     ----------
@@ -76,31 +76,49 @@ def chai1(
         Path to a JSON-formatted file containing glycosylation sites.
         If provided as a dictionary mapping chains to positions::
 
-            ``` json
-            {
-                "A": {160: "NAG(4-1 NAG(6-1 MAN(6-1(MAN(6-1 MAN))))))", 332: "NAG(4-1 NAG)"},
-                "B": {157: "NAG(4-1 NAG)", 334: "NAG(4-1 NAG(6-1 MAN(6-1(MAN(6-1 MAN))))))"},
-            }
-            ```
+        ``` json
+        {
+            "A": {160: "NAG(4-1 NAG(6-1 MAN(6-1(MAN(6-1 MAN))))))", 332: "NAG(4-1 NAG)"},
+            "B": {157: "NAG(4-1 NAG)", 334: "NAG(4-1 NAG(6-1 MAN(6-1(MAN(6-1 MAN))))))"},
+        }
+        ```
 
         The glycan sites will be applied to all FASTA files (if a directory is provided).
         If provided as a dictionary mapping FASTA file names to nested dictionaries mapping chains to positions and glycan type::
 
-            ``` json
-            {
-                "fasta_file.fasta": {
-                    "A": {10: "NAG(4-1 NAG(6-1 MAN(6-1(MAN(6-1 MAN))))))", 47: "NAG(4-1 NAG)"},
-                    "B": {27: "NAG(4-1 NAG(6-1 MAN(6-1(MAN(6-1 MAN))))))", 332: "NAG(4-1 NAG(6-1 MAN(6-1(MAN(6-1 MAN))))))"},
-                }
+        ``` json
+        {
+            "fasta_file.fasta": {
+                "A": {160: "NAG(4-1 NAG(6-1 MAN(6-1(MAN(6-1 MAN))))))", 334: "NAG(4-1 NAG)"},
+                "B": {157: "NAG(4-1 NAG)", 334: "NAG(4-1 NAG(6-1 MAN(6-1(MAN(6-1 MAN))))))"},
             }
-            ```
+        }
+        ```
 
         The glycan sites will be applied to the specified FASTA file. If any of the input
         FASTA files or chains are not found, no glycans will be applied.
 
     numbering_reference : str, optional
         Path to a JSON file containing sequences to be used as a reference for
-        calculating glycan site numbering.
+        calculating glycan site numbering. Should map chains to a reference sequence (as a string)::
+
+        ``` json
+        {
+            "A": "METFLISDLKIHITER",
+            "B": "METFLISDLKIHITER",
+        }
+        ```
+
+        Or a JSON file mapping FASTA file names to chains and reference sequences::
+
+        ``` json
+        {
+            "fasta_file.fasta": {
+                "A": "METFLISDLKIHITER",
+                "B": "METFLISDLKIHITER",
+            }
+        }
+        ```
 
     seed : int, optional, default=42
         Random seed.
@@ -123,6 +141,12 @@ def chai1(
 
     started_from_cli : bool, optional, default=False
         Whether the function was called from the CLI. This changes logging behavior.
+
+    Returns
+    -------
+    None
+
+    .. _Chai-1: https://github.com/chaidiscovery/chai-lab/tree/main?tab=readme-ov-file
 
     """
     # TODO:
@@ -195,14 +219,14 @@ def chai1(
 
     # check constraints file
     if constraints is not None:
-        check_file_exists_and_is_correct_format(constraints, "csv")
+        check_file_exists_and_is_correct_format(constraints, "constraints" "csv")
         base_constraints_df = pd.read_csv(constraints)
     else:
         base_constraints_df = None
 
     # check glycans file
     if glycans is not None:
-        check_file_exists_and_is_correct_format(glycans, "json")
+        check_file_exists_and_is_correct_format(glycans, "glycans" "json")
         with open(glycans, "r") as f:
             glycans_dict = json.load(f)
     else:
@@ -210,7 +234,9 @@ def chai1(
 
     # check numbering_reference file
     if numbering_reference is not None:
-        check_file_exists_and_is_correct_format(numbering_reference, "json")
+        check_file_exists_and_is_correct_format(
+            numbering_reference, "numbering reference", "json"
+        )
         with open(numbering_reference, "r") as f:
             numbering_reference_dict = json.load(f)
     else:
@@ -234,9 +260,11 @@ def log_fasta_file_info(fastas: Iterable[str]) -> None:
     logger.info("")
 
 
-def check_file_exists_and_is_correct_format(file: str, filetype: str | None) -> None:
+def check_file_exists_and_is_correct_format(
+    file: str, file_kind: str, filetype: str | None
+) -> None:
     if not os.path.isfile(file):
-        raise FileNotFoundError(f"File not found: {file}")
+        raise FileNotFoundError(f"{file_kind} file not found: {file}")
     if filetype is not None:
         if magika.identify_path(Path(file)).output.label != filetype:
-            raise ValueError(f"File must be a {filetype} file: {file}")
+            raise ValueError(f"{file_kind} file must be a {filetype} file: {file}")
