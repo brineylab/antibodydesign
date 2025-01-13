@@ -4,7 +4,12 @@
 
 
 def protenix(
-    fasta_path: str, output_path: str, model_path: str, device: str | None = None
+    fasta_path: str,
+    output_path: str,
+    constraints: str | None = None,
+    glycans: str | None = None,
+    numbering_reference: str | None = None,
+    device: str | None = None,
 ) -> None:
     """
     Run inference with `Protenix`_.
