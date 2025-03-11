@@ -4,5 +4,6 @@ magika
 natsort
 numpy
 prody
+pyyaml
 torch
 tqdm

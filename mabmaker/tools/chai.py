@@ -30,7 +30,7 @@ def chai1(
     numbering_reference: str | None = None,
     seed: int | Iterable[int] = 42,
     device: str | None = None,
-    low_memory: bool = True,
+    low_memory: bool = False,
     verbose: bool = False,
     debug: bool = False,
     started_from_cli: bool = False,
@@ -130,7 +130,7 @@ def chai1(
         be distributed across available GPUs. If `device` is not provided and CUDA is
         not available, the device will be set to ``"cpu"``.
 
-    low_memory : bool, optional, default=True
+    low_memory : bool, optional, default=False
         Whether to use low memory mode.
 
     verbose : bool, optional, default=False

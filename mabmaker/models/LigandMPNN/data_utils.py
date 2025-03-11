@@ -775,7 +775,10 @@ def parse_PDB(
             "NZ",
         ]
 
-    atoms = parsePDB(input_path)
+    if input_path.endswith(".cif"):
+        atoms = parseMMCIF(input_path)
+    else:
+        atoms = parsePDB(input_path)
     if not parse_atoms_with_zero_occupancy:
         atoms = atoms.select("occupancy > 0")
     if chains:
