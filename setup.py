@@ -13,7 +13,7 @@ from setuptools import find_packages, setup
 __version__ = None
 
 # read version
-version_file = os.path.join(os.path.dirname(__file__), "antibodydesign", "version.py")
+version_file = os.path.join(os.path.dirname(__file__), "mabmaker", "version.py")
 with open(version_file) as version:
     exec(version.read())
 
@@ -26,7 +26,7 @@ with open("README.md", encoding="utf-8") as readme:
     long_description = readme.read()
 
 setup(
-    name="antibodydesign",
+    name="mabmaker",
     version=__version__,
     author="Bryan Briney",
     author_email="briney@scripps.edu",
