@@ -257,7 +257,7 @@ class ProtenixFormattingMixin:
         data = {
             "name": self.name,
             "sequences": sequences + ligands + ions,
-            "covalentBonds": covalent_bonds,
+            "covalent_bonds": covalent_bonds,
         }
 
         # write to file if requested
@@ -266,7 +266,7 @@ class ProtenixFormattingMixin:
                 output_path = os.path.join(output_path, f"{self.name}.json")
             abutils.io.make_dir(os.path.dirname(output_path))
             with open(output_path, "w") as f:
-                json.dump(data, f, indent=2)
+                json.dump([data], f, indent=2)
             return output_path
         else:
             return json.dumps(data, indent=2)
