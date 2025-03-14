@@ -36,10 +36,10 @@ def setup_structure_prediction_run(
         json_paths = [
             f
             for f in abutils.list_files(json_path)
-            if magika.identify_path(Path(f)).output.label == "json"
+            if magika.identify_path(Path(f)).output.ct_label == "json"
         ]
     else:
-        if not magika.identify_path(Path(json_path)).output.label == "json":
+        if not magika.identify_path(Path(json_path)).output.ct_label == "json":
             raise ValueError(
                 f"supplied JSON file does not appear to be a JSON file: {json_path}"
             )
