@@ -81,11 +81,11 @@ def protenix(
 
     # write prediction logs (stdout and stderr)
     for run, future in zip(runs, futures):
-        stdout, stderr = future.result()
+        result = future.result()
         with open(os.path.join(output_path, run.name, "stdout.log"), "w") as f:
-            f.write(stdout)
+            f.write(result.stdout)
         with open(os.path.join(output_path, run.name, "stderr.log"), "w") as f:
-            f.write(stderr)
+            f.write(result.stderr)
 
 
 def _build_protenix_command(
