@@ -7,6 +7,7 @@ import concurrent.futures as cf
 import os
 from typing import Iterable
 
+import abutils
 from tqdm.auto import tqdm
 
 from ..utils.inputs import StructurePredictionRun, setup_structure_prediction_run
@@ -67,6 +68,7 @@ def protenix(
     with cf.ThreadPoolExecutor(max_workers=num_gpus) as executor:
         for run in runs:
             run_output_dir = os.path.join(output_path, run.name)
+            abutils.io.make_dir(run_output_dir)
             cmd = _build_protenix_command(run, run_output_dir, use_msa_server)
             futures.append(executor.submit(gpu_worker, cmd, gpu_queue))
 
