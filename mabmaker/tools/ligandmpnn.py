@@ -5,9 +5,9 @@
 import concurrent.futures
 import json
 import os
-import queue
 import shutil
-import subprocess as sp
+
+# import subprocess as sp
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, Optional, Tuple, Union
@@ -17,6 +17,8 @@ import magika
 import torch
 from natsort import natsorted
 from tqdm.auto import tqdm
+
+from ..utils.jobs import get_gpu_queue, gpu_worker
 
 __all__ = ["ligandmpnn"]
 
@@ -423,9 +425,7 @@ def ligandmpnn(
             )
 
     # set up GPU queue and thread pool
-    gpu_queue = queue.Queue()
-    for gpu in gpus:
-        gpu_queue.put(gpu)
+    gpu_queue = get_gpu_queue(gpus)
 
     # run
     futures = []
@@ -598,16 +598,16 @@ def log_splash():
     logger.info(splash)
 
 
-def gpu_worker(
-    cmd: str,
-    gpu_queue: queue.Queue,
-) -> None:
-    gpu_id = gpu_queue.get()
-    try:
-        cmd = f"CUDA_VISIBLE_DEVICES={gpu_id} {cmd}"
-        sp.run(cmd, shell=True)
-    finally:
-        gpu_queue.put(gpu_id)
+# def gpu_worker(
+#     cmd: str,
+#     gpu_queue: queue.Queue,
+# ) -> None:
+#     gpu_id = gpu_queue.get()
+#     try:
+#         cmd = f"CUDA_VISIBLE_DEVICES={gpu_id} {cmd}"
+#         sp.run(cmd, shell=True)
+#     finally:
+#         gpu_queue.put(gpu_id)
 
 
 def _get_ligandmpnn_cmd(
