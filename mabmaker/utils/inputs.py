@@ -4,6 +4,7 @@
 
 
 import json
+from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 from typing import Iterable
@@ -11,6 +12,291 @@ from typing import Iterable
 import magika
 import yaml
 from natsort import natsorted
+
+from .mixins import BoltzFormattingMixin, ChaiFormattingMixin, ProtenixFormattingMixin
+
+
+class ModelingRun(ChaiFormattingMixin, BoltzFormattingMixin, ProtenixFormattingMixin):
+    """
+    A class for parsing and formatting input data for a folding prediction run.
+
+    Parameters
+    ----------
+    params : dict
+        The input parameters. Must be a dictionary with a schema that matches that of the
+        `AlphaFold3 input JSON file`_.
+
+    .. warning::
+        Only linear (unbranched) glycans are currently supported. Branched glycans will be
+        supported in the future.
+
+    .. _AlphaFold3 input JSON file: https://github.com/google-deepmind/alphafold/tree/main/server
+
+    """
+
+    def __init__(self, params: dict | str):
+        self.params = params
+        self.name = params.get("name", None)
+        self.seeds = params.get("modelSeeds", ["42"])
+        self.dialect = params.get("dialect", "alphafoldserver")
+        self.version = params.get("version", 1)
+        self.entities = self.parse_entities()
+        self.protein_chains = [
+            entity for entity in self.entities if entity.kind == "proteinChain"
+        ]
+        self.dna_sequences = [
+            entity for entity in self.entities if entity.kind == "dnaSequence"
+        ]
+        self.rna_sequences = [
+            entity for entity in self.entities if entity.kind == "rnaSequence"
+        ]
+        self.ligands = [entity for entity in self.entities if entity.kind == "ligand"]
+        self.ions = [entity for entity in self.entities if entity.kind == "ion"]
+
+    @property
+    def glycans(self):
+        glycans = []
+        for chain in self.protein_chains:
+            glycans.extend(chain.glycans)
+        return glycans
+
+    @property
+    def num_protein_chains(self):
+        return sum(chain.count for chain in self.protein_chains)
+
+    @property
+    def num_glycans(self):
+        num = 0
+        for chain in self.protein_chains:
+            chain_num = len(chain.glycans)
+            num += chain_num * chain.count
+        return num
+
+    @property
+    def num_dna_sequences(self):
+        return sum(seq.count for seq in self.dna_sequences)
+
+    @property
+    def num_rna_sequences(self):
+        return sum(seq.count for seq in self.rna_sequences)
+
+    @property
+    def num_ligands(self):
+        return sum(ligand.count for ligand in self.ligands)
+
+    @property
+    def num_ions(self):
+        return sum(ion.count for ion in self.ions)
+
+    def num_entities(self, kind: str, include_copies: bool = False):
+        """
+        Get the number of entities of a given kind.
+
+        Parameters
+        ----------
+        kind : str
+            The kind of entity to count.
+
+        include_copies : bool, optional
+            Whether to include the number of copies of each entity. Default is ``False``,
+            which counts each entity once regardless of how many copies there are.
+
+        Returns
+        -------
+        int
+            The number of entities of the given kind.
+
+        """
+        # glycans are a special case, since they're attached to proteinChains
+        if kind.lower() == "glycan":
+            num_entities = 0
+            for chain in self.protein_chains:
+                num_glycans = len(chain.glycans)
+                if include_copies:
+                    num_glycans *= chain.count
+                num_entities += num_glycans
+        else:
+            entities = [e for e in self.entities if e.kind == kind]
+            if include_copies:
+                num_entities = sum(entity.count for entity in entities)
+            else:
+                num_entities = len(entities)
+        return num_entities
+
+    def parse_entities(self):
+        entities = []
+        sequences = self.params.get("sequences", [])
+        for s in sequences:
+            kind = list(s.keys())[0]
+            sequence = s[kind]
+            if kind == "proteinChain":
+                entities.append(ProteinChain(sequence))
+            elif kind == "dnaSequence":
+                entities.append(NucleicAcidSequence(sequence, kind=kind))
+            elif kind == "rnaSequence":
+                entities.append(NucleicAcidSequence(sequence, kind=kind))
+            elif kind == "ligand":
+                entities.append(Ligand(**sequence))
+            elif kind == "ion":
+                entities.append(Ion(**sequence))
+            else:
+                raise ValueError(f"unexpected sequence type: {sequence}")
+        return entities
+
+
+# =============================================
+#
+#                  MODIFICATIONS
+#
+# =============================================
+
+
+@dataclass
+class Modification:
+    """
+    A class for parsing and formatting modifications. Used for both protein and nucleic acid
+    modifications.
+
+    Parameters
+    ----------
+    modification_type : str | None, optional
+        The type of modification.
+
+    position : int | None, optional
+        The position of the modification.
+    """
+
+    modification_type: str | None = None
+    position: int | None = None
+
+
+@dataclass
+class Glycan:
+    """
+    A class for parsing and formatting glycans.
+
+    . warning::
+        Only linear (unbranched) glycans are currently supported. Branched glycans may be
+        supported in the future.
+
+    Parameters
+    ----------
+    residues : str | None, optional
+        The residues of the glycan.
+
+    position : int | None, optional
+        The position of the glycan.
+    """
+
+    residues: str | None = None
+    position: int | None = None
+    chain: str | None = None
+    protein_chain: str | None = None
+
+    @property
+    def chai_formatted(self):
+        if self.residues is not None:
+            return self.residues.replace("NAG(", "NAG(4-1 ").replace("MAN(", "MAN(6-1 ")
+
+    @property
+    def protenix_formatted(self):
+        if self.residues is not None:
+            return "CCD_" + self.residues.rstrip(")").replace("(", "_")
+
+
+class ModificationMixin:
+    def parse_modifications(self):
+        modifications = []
+        for modification in self.raw.get("modifications", []):
+            m = {}
+            # protein modifications
+            if "ptmType" in modification:
+                m["modification_type"] = modification.get("ptmType", None)
+                m["position"] = modification.get("ptmPosition", None)
+            # nucleic acid modifications
+            elif "modificationType" in modification:
+                m["modification_type"] = modification.get("modificationType", None)
+                m["position"] = modification.get("basePosition", None)
+            modifications.append(Modification(**m))
+        return modifications
+
+
+class GlycanMixin:
+    def parse_glycans(self):
+        glycans = []
+        for glycan in self.raw.get("glycans", []):
+            glycans.append(Glycan(**glycan))
+        return glycans
+
+
+# =============================================
+#
+#                   ENTITIES
+#
+# =============================================
+
+
+class Entity:
+    def __init__(self, sequence: dict):
+        self.raw = sequence
+        self.sequence = sequence.get("sequence", None)
+        self.count = sequence.get("count", 1)
+        self.chain = None
+
+
+class ProteinChain(Entity, ModificationMixin, GlycanMixin):
+    def __init__(self, sequence: dict):
+        super().__init__(sequence)
+        self.kind = "proteinChain"
+        self.glycans = self.parse_glycans()
+        self.modifications = self.parse_modifications()
+        self.use_structure_template = sequence.get("useStructureTemplate", True)
+        self.max_template_date = sequence.get("maxTemplateDate", None)
+
+
+class NucleicAcidSequence(Entity, ModificationMixin):
+    def __init__(self, sequence: dict, kind: str):
+        super().__init__(sequence)
+        self.kind = kind
+        self.modifications = self.parse_modifications()
+
+
+@dataclass
+class Ligand:
+    """
+    A class for parsing and formatting ligands.
+
+    Parameters
+    ----------
+    ligand : str | None, optional
+        The ligand.
+
+    count : int | None, optional
+        The count of the ligand.
+    """
+
+    kind = "ligand"
+    ligand: str | None = None
+    count: int | None = None
+
+
+@dataclass
+class Ion:
+    """
+    A class for parsing and formatting ions.
+
+    Parameters
+    ----------
+    ion : str | None, optional
+        The ion.
+
+    count : int | None, optional
+        The count of the ion.
+    """
+
+    kind = "ion"
+    ion: str | None = None
+    count: int | None = None
 
 
 class StructurePredictionInput:
@@ -195,7 +481,6 @@ class StructurePredictionInput:
 #   "dialect": "alphafold3",  # Required
 #   "version": 2  # Required
 # }
-
 
 
 class StructurePredictionJob:

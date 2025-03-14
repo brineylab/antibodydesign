@@ -25,7 +25,6 @@ def build_glycan(
     pass
 
 
-
 def _build_glycan_for_chai(
     glycan_type: str,
 ) -> str:
@@ -47,8 +46,7 @@ def _build_glycan_for_chai(
     str
         The glycan string, formatted for Chai-1.
     """
-    if 
-
+    pass
 
 
 def _build_glycan_for_protenix(
