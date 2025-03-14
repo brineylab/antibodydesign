@@ -67,9 +67,7 @@ def protenix(
     futures = []
     with cf.ThreadPoolExecutor(max_workers=num_gpus) as executor:
         for run in runs:
-            run_output_dir = os.path.join(output_path, run.name)
-            abutils.io.make_dir(run_output_dir)
-            cmd = _build_protenix_command(run, run_output_dir, use_msa_server)
+            cmd = _build_protenix_command(run, output_path, use_msa_server)
             futures.append(executor.submit(gpu_worker, cmd, gpu_queue))
 
         # monitor progress
