@@ -85,9 +85,9 @@ def protenix(
     for run, future in zip(runs, futures):
         result = future.result()
         with open(os.path.join(output_path, run.name, "stdout.log"), "w") as f:
-            f.write(result.stdout)
+            f.write(result.stdout.decode("utf-8"))
         with open(os.path.join(output_path, run.name, "stderr.log"), "w") as f:
-            f.write(result.stderr)
+            f.write(result.stderr.decode("utf-8"))
 
 
 def _build_protenix_command(
@@ -115,8 +115,11 @@ def _build_protenix_command(
         The command to run.
 
     """
-    json_path = os.path.join(out_dir, f"{run.name}.json")
     seeds = ",".join(run.seeds)
+
+    # build Protenix-formatted input JSON file
+    json_path = os.path.join(out_dir, f"{run.name}.json")
+    run.build_protenix_input(json_path)
 
     # build command
     cmd = "protenix predict"
