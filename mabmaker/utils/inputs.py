@@ -4,11 +4,13 @@
 
 
 import json
+import os
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 from typing import Iterable
 
+import abutils
 import magika
 import yaml
 from natsort import natsorted
@@ -16,9 +18,50 @@ from natsort import natsorted
 from .mixins import BoltzFormattingMixin, ChaiFormattingMixin, ProtenixFormattingMixin
 
 
-class ModelingRun(ChaiFormattingMixin, BoltzFormattingMixin, ProtenixFormattingMixin):
+def setup_structure_prediction_run(
+    json_path: str,
+    output_path: str,
+) -> Iterable:
     """
-    A class for parsing and formatting input data for a folding prediction run.
+    Setup structure prediction runs from a JSON file.
+    """
+    # setup output directory structure
+    abutils.make_dir(os.path.join(output_path, "log"))
+    abutils.make_dir(os.path.join(output_path, "preds"))
+    # read input file(s)
+    if not os.path.exists(json_path):
+        raise FileNotFoundError(f"JSON path not found: {json_path}")
+    if os.path.isdir(json_path):
+        json_paths = [
+            f
+            for f in abutils.list_files(json_path)
+            if magika.identify_path(Path(f)).output.label == "json"
+        ]
+    else:
+        if not magika.identify_path(Path(json_path)).output.label == "json":
+            raise ValueError(
+                f"supplied JSON file does not appear to be a JSON file: {json_path}"
+            )
+        json_paths = [json_path]
+    data = []
+    for json_path in json_paths:
+        with open(json_path, "r") as f:
+            data.extend(json.load(f))
+    return [StructurePredictionRun(d) for d in data]
+
+
+# =============================================
+#
+#                 MODELING RUN
+#
+# =============================================
+
+
+class StructurePredictionRun(
+    ChaiFormattingMixin, BoltzFormattingMixin, ProtenixFormattingMixin
+):
+    """
+    A class for parsing and formatting input data for a structure prediction run.
 
     Parameters
     ----------
@@ -34,7 +77,7 @@ class ModelingRun(ChaiFormattingMixin, BoltzFormattingMixin, ProtenixFormattingM
 
     """
 
-    def __init__(self, params: dict | str):
+    def __init__(self, params: dict):
         self.params = params
         self.name = params.get("name", None)
         self.seeds = params.get("modelSeeds", ["42"])
