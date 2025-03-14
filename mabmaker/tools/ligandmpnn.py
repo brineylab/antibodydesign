@@ -13,8 +13,8 @@ from pathlib import Path
 from typing import Dict, Iterable, Optional, Tuple, Union
 
 import abutils
-import magika
 import torch
+from magika import Magika
 from natsort import natsorted
 from tqdm.auto import tqdm
 
@@ -676,6 +676,7 @@ def _process_chain_or_residue_data(
         Residue dictionary.
 
     """
+    magika = Magika()
     if data is not None:
         if isinstance(data, str):
             if os.path.isfile(data):

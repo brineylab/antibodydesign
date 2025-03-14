@@ -11,8 +11,8 @@ from pathlib import Path
 from typing import Iterable
 
 import abutils
-import magika
 import yaml
+from magika import Magika
 from natsort import natsorted
 
 from .mixins import BoltzFormattingMixin, ChaiFormattingMixin, ProtenixFormattingMixin
@@ -29,6 +29,7 @@ def setup_structure_prediction_run(
     abutils.io.make_dir(os.path.join(output_path, "log"))
     abutils.io.make_dir(os.path.join(output_path, "preds"))
     # read input file(s)
+    magika = Magika()
     if not os.path.exists(json_path):
         raise FileNotFoundError(f"JSON path not found: {json_path}")
     if os.path.isdir(json_path):
@@ -472,6 +473,7 @@ class StructurePredictionInput:
         self.debug = debug
 
         # input parsing
+        magika = Magika()
         if magika.identify_path(Path(input_path)).output.label == "yaml":
             with open(input_path, "r") as f:
                 self.input_data = yaml.load_all(f)
