@@ -474,10 +474,10 @@ class StructurePredictionInput:
 
         # input parsing
         magika = Magika()
-        if magika.identify_path(Path(input_path)).output.label == "yaml":
+        if magika.identify_path(Path(input_path)).output.ct_label == "yaml":
             with open(input_path, "r") as f:
                 self.input_data = yaml.load_all(f)
-        elif magika.identify_path(Path(input_path)).output.label == "json":
+        elif magika.identify_path(Path(input_path)).output.ct_label == "json":
             with open(input_path, "r") as f:
                 self.input_data = json.load(f)
         else:

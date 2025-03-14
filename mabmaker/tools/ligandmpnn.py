@@ -680,7 +680,7 @@ def _process_chain_or_residue_data(
     if data is not None:
         if isinstance(data, str):
             if os.path.isfile(data):
-                filetype = magika.identify_path(Path(data)).output.label
+                filetype = magika.identify_path(Path(data)).output.ct_label
                 with open(data, "r") as f:
                     # JSON file, which is a mapping of PDB file paths to residue IDs
                     if filetype == "json":
