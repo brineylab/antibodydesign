@@ -26,8 +26,8 @@ def setup_structure_prediction_run(
     Setup structure prediction runs from a JSON file.
     """
     # setup output directory structure
-    abutils.make_dir(os.path.join(output_path, "log"))
-    abutils.make_dir(os.path.join(output_path, "preds"))
+    abutils.io.make_dir(os.path.join(output_path, "log"))
+    abutils.io.make_dir(os.path.join(output_path, "preds"))
     # read input file(s)
     if not os.path.exists(json_path):
         raise FileNotFoundError(f"JSON path not found: {json_path}")
